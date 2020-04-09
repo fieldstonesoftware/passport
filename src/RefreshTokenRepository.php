@@ -2,37 +2,43 @@
 
 namespace Laravel\Passport;
 
+use DateTimeImmutable;
+use Laravel\Passport\Contracts\RefreshTokenContract;
+
 class RefreshTokenRepository
 {
     /**
      * Creates a new refresh token.
      *
-     * @param  array  $attributes
-     * @return \Laravel\Passport\RefreshToken
+     * @param  mixed  $id
+     * @param  mixed  $access_token_id
+     * @param  bool  $revoked
+     * @param  DateTimeImmutable  $expires_at
+     * @return \Laravel\Passport\Contracts\RefreshTokenContract
      */
-    public function create($attributes)
+    public function create($id, $access_token_id, $revoked, $expires_at)
     {
-        return Passport::refreshToken()->create($attributes);
+        return Passport::refreshToken()->createRefreshToken($id, $access_token_id, $revoked, $expires_at);
     }
 
     /**
      * Gets a refresh token by the given ID.
      *
      * @param  string  $id
-     * @return \Laravel\Passport\RefreshToken
+     * @return \Laravel\Passport\Contracts\RefreshTokenContract
      */
     public function find($id)
     {
-        return Passport::refreshToken()->where('id', $id)->first();
+        return Passport::refreshToken()->findById($id);
     }
 
     /**
      * Stores the given token instance.
      *
-     * @param  \Laravel\Passport\RefreshToken  $token
+     * @param  \Laravel\Passport\Contracts\RefreshTokenContract  $token
      * @return void
      */
-    public function save(RefreshToken $token)
+    public function save(\Laravel\Passport\Contracts\RefreshTokenContract $token)
     {
         $token->save();
     }
@@ -45,7 +51,9 @@ class RefreshTokenRepository
      */
     public function revokeRefreshToken($id)
     {
-        return Passport::refreshToken()->where('id', $id)->update(['revoked' => true]);
+        $token = $this->find($id);
+        if($token) return $token->revoke();
+        return false;
     }
 
     /**
@@ -56,7 +64,7 @@ class RefreshTokenRepository
      */
     public function revokeRefreshTokensByAccessTokenId($tokenId)
     {
-        Passport::refreshToken()->where('access_token_id', $tokenId)->update(['revoked' => true]);
+        Passport::refreshToken()->revokeWithAccessTokenId($tokenId);
     }
 
     /**
@@ -68,7 +76,7 @@ class RefreshTokenRepository
     public function isRefreshTokenRevoked($id)
     {
         if ($token = $this->find($id)) {
-            return $token->revoked;
+            return $token->isRevoked();
         }
 
         return true;

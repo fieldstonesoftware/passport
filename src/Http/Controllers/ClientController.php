@@ -66,7 +66,7 @@ class ClientController
      * Store a new client.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Laravel\Passport\Client
+     * @return \Laravel\Passport\Contracts\ClientContract
      */
     public function store(Request $request)
     {
@@ -87,7 +87,7 @@ class ClientController
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  string  $clientId
-     * @return \Illuminate\Http\Response|\Laravel\Passport\Client
+     * @return \Illuminate\Http\Response|\Laravel\Passport\Contracts\ClientContract
      */
     public function update(Request $request, $clientId)
     {

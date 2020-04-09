@@ -3,6 +3,7 @@
 namespace Laravel\Passport\Bridge;
 
 use Laravel\Passport\ClientRepository as ClientModelRepository;
+use Laravel\Passport\Contracts\ClientContract;
 use Laravel\Passport\Passport;
 use League\OAuth2\Server\Repositories\ClientRepositoryInterface;
 
@@ -38,7 +39,7 @@ class ClientRepository implements ClientRepositoryInterface
         }
 
         return new Client(
-            $clientIdentifier, $record->name, $record->redirect, $record->confidential()
+            $clientIdentifier, $record->name(), $record->redirect(), $record->confidential()
         );
     }
 
@@ -56,19 +57,20 @@ class ClientRepository implements ClientRepositoryInterface
             return false;
         }
 
-        return ! $record->confidential() || $this->verifySecret((string) $clientSecret, $record->secret);
+        return ! $record->confidential() || $this->verifySecret((string) $clientSecret, $record->secret());
     }
 
     /**
      * Determine if the given client can handle the given grant type.
      *
-     * @param  \Laravel\Passport\Client  $record
+     * @param  \Laravel\Passport\Contracts\ClientContract  $record
      * @param  string  $grantType
      * @return bool
      */
-    protected function handlesGrant($record, $grantType)
+    protected function handlesGrant(ClientContract $record, $grantType)
     {
-        if (is_array($record->grant_types) && ! in_array($grantType, $record->grant_types)) {
+        $clientGrantTypes = $record->getGrantTypes();
+        if (is_array($clientGrantTypes) && ! in_array($grantType, $clientGrantTypes)) {
             return false;
         }
 
@@ -76,9 +78,9 @@ class ClientRepository implements ClientRepositoryInterface
             case 'authorization_code':
                 return ! $record->firstParty();
             case 'personal_access':
-                return $record->personal_access_client && $record->confidential();
+                return $record->personalAccessClient() && $record->confidential();
             case 'password':
-                return $record->password_client;
+                return $record->passwordClient();
             case 'client_credentials':
                 return $record->confidential();
             default:

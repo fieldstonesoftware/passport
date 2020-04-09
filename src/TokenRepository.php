@@ -2,30 +2,40 @@
 
 namespace Laravel\Passport;
 
-use Carbon\Carbon;
+use Laravel\Passport\Contracts\TokenContract;
 
 class TokenRepository
 {
     /**
      * Creates a new Access Token.
      *
-     * @param  array  $attributes
-     * @return \Laravel\Passport\Token
+     * @param $id
+     * @param $userId
+     * @param $clientId
+     * @param $scopes
+     * @param $revoked
+     * @param $created_at
+     * @param $updated_at
+     * @param $expires_at
+     * @return \Laravel\Passport\Contracts\TokenContract
      */
-    public function create($attributes)
-    {
-        return Passport::token()->create($attributes);
+    public function create(
+        $id, $userId, $clientId, $scopes, $revoked, $created_at, $updated_at, $expires_at
+    ){
+        return Passport::token()->createToken(
+            $id, $userId, $clientId, $scopes, $revoked, $created_at, $updated_at, $expires_at
+        );
     }
 
     /**
      * Get a token by the given ID.
      *
      * @param  string  $id
-     * @return \Laravel\Passport\Token
+     * @return \Laravel\Passport\Contracts\TokenContract
      */
     public function find($id)
     {
-        return Passport::token()->where('id', $id)->first();
+        return Passport::token()->findById($id);
     }
 
     /**
@@ -33,11 +43,11 @@ class TokenRepository
      *
      * @param  string  $id
      * @param  int  $userId
-     * @return \Laravel\Passport\Token|null
+     * @return \Laravel\Passport\Contracts\TokenContract|null
      */
     public function findForUser($id, $userId)
     {
-        return Passport::token()->where('id', $id)->where('user_id', $userId)->first();
+        return Passport::token()->findForUser($id, $userId);
     }
 
     /**
@@ -48,32 +58,16 @@ class TokenRepository
      */
     public function forUser($userId)
     {
-        return Passport::token()->where('user_id', $userId)->get();
-    }
-
-    /**
-     * Get a valid token instance for the given user and client.
-     *
-     * @param  \Illuminate\Database\Eloquent\Model  $user
-     * @param  \Laravel\Passport\Client  $client
-     * @return \Laravel\Passport\Token|null
-     */
-    public function getValidToken($user, $client)
-    {
-        return $client->tokens()
-                    ->whereUserId($user->getAuthIdentifier())
-                    ->where('revoked', 0)
-                    ->where('expires_at', '>', Carbon::now())
-                    ->first();
+        return Passport::token()->forUserId($userId);
     }
 
     /**
      * Store the given token instance.
      *
-     * @param  \Laravel\Passport\Token  $token
+     * @param  \Laravel\Passport\Contracts\TokenContract  $token
      * @return void
      */
-    public function save(Token $token)
+    public function save(TokenContract $token)
     {
         $token->save();
     }
@@ -86,7 +80,7 @@ class TokenRepository
      */
     public function revokeAccessToken($id)
     {
-        return Passport::token()->where('id', $id)->update(['revoked' => true]);
+        return Passport::token()->findById($id)->revoke();
     }
 
     /**
@@ -98,7 +92,7 @@ class TokenRepository
     public function isAccessTokenRevoked($id)
     {
         if ($token = $this->find($id)) {
-            return $token->revoked;
+            return $token->isRevoked();
         }
 
         return true;
@@ -108,16 +102,11 @@ class TokenRepository
      * Find a valid token for the given user and client.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $user
-     * @param  \Laravel\Passport\Client  $client
-     * @return \Laravel\Passport\Token|null
+     * @param  \Laravel\Passport\Contracts\ClientContract  $client
+     * @return \Laravel\Passport\Contracts\TokenContract|null
      */
     public function findValidToken($user, $client)
     {
-        return $client->tokens()
-                      ->whereUserId($user->getAuthIdentifier())
-                      ->where('revoked', 0)
-                      ->where('expires_at', '>', Carbon::now())
-                      ->latest('expires_at')
-                      ->first();
+        return Passport::token()->findValidToken($user, $client);
     }
 }

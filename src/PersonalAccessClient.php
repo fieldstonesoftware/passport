@@ -3,8 +3,9 @@
 namespace Laravel\Passport;
 
 use Illuminate\Database\Eloquent\Model;
+use Laravel\Passport\Contracts\PersonalAccessClientContract;
 
-class PersonalAccessClient extends Model
+class PersonalAccessClient extends Model implements PersonalAccessClientContract
 {
     /**
      * The database table used by the model.
@@ -21,12 +22,22 @@ class PersonalAccessClient extends Model
     protected $guarded = [];
 
     /**
-     * Get all of the authentication codes for the client.
+     * Get the client that the personal access client belongs to.
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function client()
     {
         return $this->belongsTo(Passport::clientModel());
+    }
+
+    /**
+     * Return the latest created personal access client.
+     *
+     * @return \Laravel\Passport\Contracts\PersonalAccessClientContract
+     */
+    public function getLatestCreated()
+    {
+        return Passport::personalAccessClient()::latest('created_at')->first();
     }
 }

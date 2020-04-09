@@ -3,7 +3,6 @@
 namespace Laravel\Passport\Console;
 
 use Illuminate\Console\Command;
-use Laravel\Passport\Client;
 use Laravel\Passport\ClientRepository;
 
 class ClientCommand extends Command
@@ -147,12 +146,12 @@ class ClientCommand extends Command
     /**
      * Output the client's ID and secret key.
      *
-     * @param  \Laravel\Passport\Client  $client
+     * @param  \Laravel\Passport\Contracts\ClientContract  $client
      * @return void
      */
-    protected function outputClientDetails(Client $client)
+    protected function outputClientDetails(\Laravel\Passport\Contracts\ClientContract $client)
     {
-        $this->line('<comment>Client ID:</comment> '.$client->id);
-        $this->line('<comment>Client secret:</comment> '.$client->secret);
+        $this->line('<comment>Client ID:</comment> '.$client->getKey());
+        $this->line('<comment>Client secret:</comment> '.$client->secret());
     }
 }

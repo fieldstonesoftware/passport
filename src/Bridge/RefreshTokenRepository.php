@@ -13,7 +13,7 @@ class RefreshTokenRepository implements RefreshTokenRepositoryInterface
     /**
      * The refresh token repository instance.
      *
-     * @var \Illuminate\Database\Connection
+     * @var \Laravel\Passport\RefreshTokenRepository
      */
     protected $refreshTokenRepository;
 
@@ -50,12 +50,12 @@ class RefreshTokenRepository implements RefreshTokenRepositoryInterface
      */
     public function persistNewRefreshToken(RefreshTokenEntityInterface $refreshTokenEntity)
     {
-        $this->refreshTokenRepository->create([
-            'id' => $id = $refreshTokenEntity->getIdentifier(),
-            'access_token_id' => $accessTokenId = $refreshTokenEntity->getAccessToken()->getIdentifier(),
-            'revoked' => false,
-            'expires_at' => $refreshTokenEntity->getExpiryDateTime(),
-        ]);
+        $id = $refreshTokenEntity->getIdentifier();
+        $accessTokenId = $refreshTokenEntity->getAccessToken()->getIdentifier();
+
+        $this->refreshTokenRepository->create(
+            $id, $accessTokenId, false, $refreshTokenEntity->getExpiryDateTime()
+        );
 
         $this->events->dispatch(new RefreshTokenCreated($id, $accessTokenId));
     }

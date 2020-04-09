@@ -103,35 +103,35 @@ class Passport
      *
      * @var string
      */
-    public static $authCodeModel = 'Laravel\Passport\AuthCode';
+    public static $authCodeModel = AuthCode::class;
 
     /**
      * The client model class name.
      *
      * @var string
      */
-    public static $clientModel = 'Laravel\Passport\Client';
+    public static $clientModel = Client::class;
 
     /**
      * The personal access client model class name.
      *
      * @var string
      */
-    public static $personalAccessClientModel = 'Laravel\Passport\PersonalAccessClient';
+    public static $personalAccessClientModel = PersonalAccessClient::class;
 
     /**
      * The token model class name.
      *
      * @var string
      */
-    public static $tokenModel = 'Laravel\Passport\Token';
+    public static $tokenModel = Token::class;
 
     /**
      * The refresh token model class name.
      *
      * @var string
      */
-    public static $refreshTokenModel = 'Laravel\Passport\RefreshToken';
+    public static $refreshTokenModel = RefreshToken::class;
 
     /**
      * Indicates if Passport migrations will be run.
@@ -501,7 +501,7 @@ class Passport
     /**
      * Get a new auth code model instance.
      *
-     * @return \Laravel\Passport\AuthCode
+     * @return \Laravel\Passport\Contracts\AuthCodeContract
      */
     public static function authCode()
     {
@@ -532,7 +532,7 @@ class Passport
     /**
      * Get a new client model instance.
      *
-     * @return \Laravel\Passport\Client
+     * @return \Laravel\Passport\Contracts\ClientContract
      */
     public static function client()
     {
@@ -563,7 +563,7 @@ class Passport
     /**
      * Get a new personal access client model instance.
      *
-     * @return \Laravel\Passport\PersonalAccessClient
+     * @return \Laravel\Passport\Contracts\PersonalAccessClientContract
      */
     public static function personalAccessClient()
     {
@@ -594,7 +594,7 @@ class Passport
     /**
      * Get a new personal access client model instance.
      *
-     * @return \Laravel\Passport\Token
+     * @return \Laravel\Passport\Contracts\TokenContract
      */
     public static function token()
     {
@@ -625,7 +625,7 @@ class Passport
     /**
      * Get a new refresh token model instance.
      *
-     * @return \Laravel\Passport\RefreshToken
+     * @return \Laravel\Passport\Contracts\RefreshTokenContract
      */
     public static function refreshToken()
     {

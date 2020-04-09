@@ -5,6 +5,7 @@ namespace Laravel\Passport\Tests;
 use Laravel\Passport\Bridge\Client;
 use Laravel\Passport\Bridge\ClientRepository as BridgeClientRepository;
 use Laravel\Passport\ClientRepository;
+use Laravel\Passport\Contracts\ClientContract;
 use Laravel\Passport\Passport;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -182,7 +183,7 @@ class BridgeClientRepositoryTest extends TestCase
     }
 }
 
-class BridgeClientRepositoryTestClientStub
+class BridgeClientRepositoryTestClientStub implements ClientContract
 {
     public $name = 'Client';
 
@@ -205,4 +206,69 @@ class BridgeClientRepositoryTestClientStub
     {
         return ! empty($this->secret);
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function secret()
+    {
+        return $this->secret;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function redirect()
+    {
+        return $this->redirect;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function name()
+    {
+        return $this->name;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function passwordClient()
+    {
+        return $this->password_client;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function personalAccessClient()
+    {
+        return $this->personal_access_client;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getGrantTypes()
+    {
+        return $this->grant_types;
+    }
+
+    // methods below not required for this test
+    public function createClient($userId, $name, $redirect, $personalAccess = false, $password = false, $confidential = true){}
+    public function user(){}
+    public function authCodes(){}
+    public function tokens(){}
+    public function createPersonalAccessClient(){}
+    public function getKey(){}
+    public function getClientSecret(){}
+    public function findById($id){}
+    public function findForUser($clientId, $userId){}
+    public function forUser($userId){}
+    public function isRevoked(){}
+    public function updateNameAndRedirect($name, $redirect){}
+    public function regenerateSecret(){}
+    public function revokeTokens(){}
+    public function revoke(){}
 }

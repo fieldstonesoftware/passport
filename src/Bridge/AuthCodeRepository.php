@@ -23,16 +23,14 @@ class AuthCodeRepository implements AuthCodeRepositoryInterface
      */
     public function persistNewAuthCode(AuthCodeEntityInterface $authCodeEntity)
     {
-        $attributes = [
-            'id' => $authCodeEntity->getIdentifier(),
-            'user_id' => $authCodeEntity->getUserIdentifier(),
-            'client_id' => $authCodeEntity->getClient()->getIdentifier(),
-            'scopes' => $this->formatScopesForStorage($authCodeEntity->getScopes()),
-            'revoked' => false,
-            'expires_at' => $authCodeEntity->getExpiryDateTime(),
-        ];
-
-        Passport::authCode()->setRawAttributes($attributes)->save();
+        Passport::authCode()->createAuthCode(
+             $authCodeEntity->getIdentifier(),
+             $authCodeEntity->getUserIdentifier(),
+             $authCodeEntity->getClient()->getIdentifier(),
+             $this->formatScopesForStorage($authCodeEntity->getScopes()),
+             false,
+             $authCodeEntity->getExpiryDateTime()
+        );
     }
 
     /**
@@ -40,7 +38,8 @@ class AuthCodeRepository implements AuthCodeRepositoryInterface
      */
     public function revokeAuthCode($codeId)
     {
-        Passport::authCode()->where('id', $codeId)->update(['revoked' => true]);
+        $authCode = Passport::authCode()->findById($codeId);
+        if($authCode) $authCode->revoke();
     }
 
     /**
@@ -48,6 +47,8 @@ class AuthCodeRepository implements AuthCodeRepositoryInterface
      */
     public function isAuthCodeRevoked($codeId)
     {
-        return Passport::authCode()->where('id', $codeId)->where('revoked', 1)->exists();
+        $authCode = Passport::authCode()->findById($codeId);
+        if($authCode) return $authCode->isRevoked();
+        return true;
     }
 }

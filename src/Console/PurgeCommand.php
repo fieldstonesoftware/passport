@@ -4,9 +4,7 @@ namespace Laravel\Passport\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
-use Laravel\Passport\AuthCode;
-use Laravel\Passport\RefreshToken;
-use Laravel\Passport\Token;
+use Laravel\Passport\Passport;
 
 class PurgeCommand extends Command
 {
@@ -35,21 +33,21 @@ class PurgeCommand extends Command
 
         if (($this->option('revoked') && $this->option('expired')) ||
             (! $this->option('revoked') && ! $this->option('expired'))) {
-            Token::where('revoked', 1)->orWhereDate('expires_at', '<', $expired)->delete();
-            AuthCode::where('revoked', 1)->orWhereDate('expires_at', '<', $expired)->delete();
-            RefreshToken::where('revoked', 1)->orWhereDate('expires_at', '<', $expired)->delete();
+            Passport::token()->deleteRevokedOrExpiredPriorTo($expired);
+            Passport::authCode()->deleteRevokedOrExpiredPriorTo($expired);
+            Passport::refreshToken()->deleteRevokedOrExpiredPriorTo($expired);
 
             $this->info('Purged revoked items and items expired for more than seven days.');
         } elseif ($this->option('revoked')) {
-            Token::where('revoked', 1)->delete();
-            AuthCode::where('revoked', 1)->delete();
-            RefreshToken::where('revoked', 1)->delete();
+            Passport::token()->deleteRevoked();
+            Passport::authCode()->deleteRevoked();
+            Passport::refreshToken()->deleteRevoked();
 
             $this->info('Purged revoked items.');
         } elseif ($this->option('expired')) {
-            Token::whereDate('expires_at', '<', $expired)->delete();
-            AuthCode::whereDate('expires_at', '<', $expired)->delete();
-            RefreshToken::whereDate('expires_at', '<', $expired)->delete();
+            Passport::token()->deleteExpiredPriorTo($expired);
+            Passport::authCode()->deleteExpiredPriorTo($expired);
+            Passport::refreshToken()->deleteExpiredPriorTo($expired);
 
             $this->info('Purged items expired for more than seven days.');
         }

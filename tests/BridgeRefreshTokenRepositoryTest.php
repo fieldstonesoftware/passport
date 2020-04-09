@@ -2,7 +2,9 @@
 
 namespace Laravel\Passport\Tests;
 
+use Illuminate\Support\Carbon;
 use Laravel\Passport\Bridge\RefreshTokenRepository as BridgeRefreshTokenRepository;
+use Laravel\Passport\Contracts\TokenContract;
 use Laravel\Passport\RefreshTokenRepository;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -51,12 +53,56 @@ class BridgeRefreshTokenRepositoryTest extends TestCase
     }
 }
 
-class ActiveRefreshToken
+class ActiveRefreshToken implements TokenContract
 {
     public $revoked = false;
+
+    /**
+     * @inheritDoc
+     */
+    public function isRevoked()
+    {
+        return $this->revoked;
+    }
+
+    // methods below not required for this test.
+    public function client(){}
+    public function user(){}
+    public function createToken($id, $userId, $clientId, $scopes, $revoked, $createdAt, $updateAt, $expiresAt){}
+    public function findById($id){}
+    public function findForUser($tokenId, $userId){}
+    public function findValidToken($user, $client){}
+    public function forUserId($userId){}
+    public function revoke(){}
+    public function deleteRevoked(){}
+    public function deleteExpiredPriorTo(Carbon $expired){}
+    public function deleteRevokedOrExpiredPriorTo(Carbon $expired){}
+    public function save(){}
 }
 
-class RevokedRefreshToken
+class RevokedRefreshToken implements TokenContract
 {
     public $revoked = true;
+
+    /**
+     * @inheritDoc
+     */
+    public function isRevoked()
+    {
+        return $this->revoked;
+    }
+
+    // methods below not required for this test.
+    public function client(){}
+    public function user(){}
+    public function createToken($id, $userId, $clientId, $scopes, $revoked, $createdAt, $updateAt, $expiresAt){}
+    public function findById($id){}
+    public function findForUser($tokenId, $userId){}
+    public function findValidToken($user, $client){}
+    public function forUserId($userId){}
+    public function revoke(){}
+    public function deleteRevoked(){}
+    public function deleteExpiredPriorTo(Carbon $expired){}
+    public function deleteRevokedOrExpiredPriorTo(Carbon $expired){}
+    public function save(){}
 }

@@ -2,7 +2,6 @@
 
 namespace Laravel\Passport;
 
-use Illuminate\Support\Str;
 use RuntimeException;
 
 class ClientRepository
@@ -11,26 +10,24 @@ class ClientRepository
      * Get a client by the given ID.
      *
      * @param  int  $id
-     * @return \Laravel\Passport\Client|null
+     * @return \Laravel\Passport\Contracts\ClientContract|null
      */
     public function find($id)
     {
-        $client = Passport::client();
-
-        return $client->where($client->getKeyName(), $id)->first();
+        return Passport::client()->findById($id);
     }
 
     /**
      * Get an active client by the given ID.
      *
      * @param  int  $id
-     * @return \Laravel\Passport\Client|null
+     * @return \Laravel\Passport\Contracts\ClientContract|null
      */
     public function findActive($id)
     {
         $client = $this->find($id);
 
-        return $client && ! $client->revoked ? $client : null;
+        return $client && ! $client->isRevoked() ? $client : null;
     }
 
     /**
@@ -38,16 +35,11 @@ class ClientRepository
      *
      * @param  int  $clientId
      * @param  mixed  $userId
-     * @return \Laravel\Passport\Client|null
+     * @return \Laravel\Passport\Contracts\ClientContract|null
      */
     public function findForUser($clientId, $userId)
     {
-        $client = Passport::client();
-
-        return $client
-                    ->where($client->getKeyName(), $clientId)
-                    ->where('user_id', $userId)
-                    ->first();
+        return Passport::client()->findForUser($clientId, $userId);
     }
 
     /**
@@ -58,9 +50,7 @@ class ClientRepository
      */
     public function forUser($userId)
     {
-        return Passport::client()
-                    ->where('user_id', $userId)
-                    ->orderBy('name', 'asc')->get();
+        return Passport::client()->forUser($userId);
     }
 
     /**
@@ -71,15 +61,16 @@ class ClientRepository
      */
     public function activeForUser($userId)
     {
-        return $this->forUser($userId)->reject(function ($client) {
-            return $client->revoked;
+        return $this->forUser($userId)->reject(
+            function (\Laravel\Passport\Contracts\ClientContract $client) {
+                return $client->isRevoked();
         })->values();
     }
 
     /**
      * Get the personal access token client for the application.
      *
-     * @return \Laravel\Passport\Client
+     * @return \Laravel\Passport\Contracts\PersonalAccessClientContract
      *
      * @throws \RuntimeException
      */
@@ -95,7 +86,7 @@ class ClientRepository
             throw new RuntimeException('Personal access client not found. Please create one.');
         }
 
-        return $client->orderBy($client->getKeyName(), 'desc')->first()->client;
+        return $client->getLatestCreated()->client;
     }
 
     /**
@@ -107,23 +98,13 @@ class ClientRepository
      * @param  bool  $personalAccess
      * @param  bool  $password
      * @param  bool  $confidential
-     * @return \Laravel\Passport\Client
+     * @return \Laravel\Passport\Contracts\ClientContract
      */
     public function create($userId, $name, $redirect, $personalAccess = false, $password = false, $confidential = true)
     {
-        $client = Passport::client()->forceFill([
-            'user_id' => $userId,
-            'name' => $name,
-            'secret' => ($confidential || $personalAccess) ? Str::random(40) : null,
-            'redirect' => $redirect,
-            'personal_access_client' => $personalAccess,
-            'password_client' => $password,
-            'revoked' => false,
-        ]);
-
-        $client->save();
-
-        return $client;
+        return Passport::client()->createClient(
+            $userId, $name, $redirect, $personalAccess, $password, $confidential
+        );
     }
 
     /**
@@ -132,14 +113,13 @@ class ClientRepository
      * @param  int  $userId
      * @param  string  $name
      * @param  string  $redirect
-     * @return \Laravel\Passport\Client
+     * @return \Laravel\Passport\Contracts\ClientContract
      */
     public function createPersonalAccessClient($userId, $name, $redirect)
     {
-        return tap($this->create($userId, $name, $redirect, true), function ($client) {
-            $accessClient = Passport::personalAccessClient();
-            $accessClient->client_id = $client->id;
-            $accessClient->save();
+        return tap($this->create($userId, $name, $redirect, true)
+            , function (\Laravel\Passport\Contracts\ClientContract $client) {
+            $client->createPersonalAccessClient();
         });
     }
 
@@ -149,7 +129,7 @@ class ClientRepository
      * @param  int  $userId
      * @param  string  $name
      * @param  string  $redirect
-     * @return \Laravel\Passport\Client
+     * @return \Laravel\Passport\Contracts\ClientContract
      */
     public function createPasswordGrantClient($userId, $name, $redirect)
     {
@@ -159,33 +139,25 @@ class ClientRepository
     /**
      * Update the given client.
      *
-     * @param  \Laravel\Passport\Client  $client
+     * @param  \Laravel\Passport\Contracts\ClientContract  $client
      * @param  string  $name
      * @param  string  $redirect
-     * @return \Laravel\Passport\Client
+     * @return \Laravel\Passport\Contracts\ClientContract
      */
-    public function update(Client $client, $name, $redirect)
+    public function update(\Laravel\Passport\Contracts\ClientContract $client, $name, $redirect)
     {
-        $client->forceFill([
-            'name' => $name, 'redirect' => $redirect,
-        ])->save();
-
-        return $client;
+        return $client->updateNameAndRedirect($name, $redirect);
     }
 
     /**
      * Regenerate the client secret.
      *
-     * @param  \Laravel\Passport\Client  $client
-     * @return \Laravel\Passport\Client
+     * @param  \Laravel\Passport\Contracts\ClientContract  $client
+     * @return \Laravel\Passport\Contracts\ClientContract
      */
-    public function regenerateSecret(Client $client)
+    public function regenerateSecret(\Laravel\Passport\Contracts\ClientContract $client)
     {
-        $client->forceFill([
-            'secret' => Str::random(40),
-        ])->save();
-
-        return $client;
+        return $client->regenerateSecret();
     }
 
     /**
@@ -198,19 +170,18 @@ class ClientRepository
     {
         $client = $this->find($id);
 
-        return is_null($client) || $client->revoked;
+        return is_null($client) || $client->isRevoked();
     }
 
     /**
      * Delete the given client.
      *
-     * @param  \Laravel\Passport\Client  $client
+     * @param  \Laravel\Passport\Contracts\ClientContract  $client
      * @return void
      */
-    public function delete(Client $client)
+    public function delete(\Laravel\Passport\Contracts\ClientContract $client)
     {
-        $client->tokens()->update(['revoked' => true]);
-
-        $client->forceFill(['revoked' => true])->save();
+        $client->revokeTokens();
+        $client->revoke();
     }
 }

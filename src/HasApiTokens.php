@@ -9,7 +9,7 @@ trait HasApiTokens
     /**
      * The current access token for the authentication user.
      *
-     * @var \Laravel\Passport\Token
+     * @var \Laravel\Passport\Contracts\TokenContract
      */
     protected $accessToken;
 
@@ -36,7 +36,7 @@ trait HasApiTokens
     /**
      * Get the current access token being used by the user.
      *
-     * @return \Laravel\Passport\Token|null
+     * @return \Laravel\Passport\Contracts\TokenContract|null
      */
     public function token()
     {
@@ -71,7 +71,7 @@ trait HasApiTokens
     /**
      * Set the current access token for the user.
      *
-     * @param  \Laravel\Passport\Token  $accessToken
+     * @param  \Laravel\Passport\Contracts\TokenContract  $accessToken
      * @return $this
      */
     public function withAccessToken($accessToken)

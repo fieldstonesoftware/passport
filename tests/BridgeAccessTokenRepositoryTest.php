@@ -26,20 +26,26 @@ class BridgeAccessTokenRepositoryTest extends TestCase
         $tokenRepository = m::mock(TokenRepository::class);
         $events = m::mock(Dispatcher::class);
 
-        $tokenRepository->shouldReceive('create')->once()->andReturnUsing(function ($array) use ($expiration) {
-            $this->assertEquals(1, $array['id']);
-            $this->assertEquals(2, $array['user_id']);
-            $this->assertEquals('client-id', $array['client_id']);
-            $this->assertEquals(['scopes'], $array['scopes']);
-            $this->assertEquals(false, $array['revoked']);
-            $this->assertInstanceOf('DateTime', $array['created_at']);
-            $this->assertInstanceOf('DateTime', $array['updated_at']);
-            $this->assertEquals($expiration, $array['expires_at']);
+        $testScopes = 'scopes';
+        $testClientId = 'client-id';
+        $testName = 'name';
+        $testRedirect = 'redirect';
+
+        $tokenRepository->shouldReceive('create')->once()->andReturnUsing(
+            function ($id, $userId, $clientId, $scopes, $revoked, $created_at, $updated_at, $expires_at) use ($expiration) {
+            $this->assertEquals(1, $id);
+            $this->assertEquals(2, $userId);
+            $this->assertEquals('client-id', $clientId);
+            $this->assertEquals(['scopes'], $scopes);
+            $this->assertEquals(false, $revoked);
+            $this->assertInstanceOf('DateTime', $created_at);
+            $this->assertInstanceOf('DateTime', $updated_at);
+            $this->assertEquals($expiration, $expires_at);
         });
 
         $events->shouldReceive('dispatch')->once();
 
-        $accessToken = new AccessToken(2, [new Scope('scopes')], new Client('client-id', 'name', 'redirect'));
+        $accessToken = new AccessToken(2, [new Scope($testScopes)], new Client($testClientId, $testName, $testRedirect));
         $accessToken->setIdentifier(1);
         $accessToken->setExpiryDateTime($expiration);
 

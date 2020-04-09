@@ -86,7 +86,7 @@ class PersonalAccessTokenFactory
     /**
      * Create a request instance for the given client.
      *
-     * @param  \Laravel\Passport\Client  $client
+     * @param  \Laravel\Passport\Contracts\ClientContract  $client
      * @param  mixed  $userId
      * @param  array  $scopes
      * @return \Laminas\Diactoros\ServerRequest
@@ -95,8 +95,8 @@ class PersonalAccessTokenFactory
     {
         return (new ServerRequest)->withParsedBody([
             'grant_type' => 'personal_access',
-            'client_id' => $client->id,
-            'client_secret' => $client->secret,
+            'client_id' => $client->getKey(),
+            'client_secret' => $client->getClientSecret(),
             'user_id' => $userId,
             'scope' => implode(' ', $scopes),
         ]);
@@ -119,7 +119,7 @@ class PersonalAccessTokenFactory
      * Get the access token instance for the parsed response.
      *
      * @param  array  $response
-     * @return \Laravel\Passport\Token
+     * @return \Laravel\Passport\Contracts\TokenContract
      */
     protected function findAccessToken(array $response)
     {

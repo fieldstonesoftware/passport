@@ -3,6 +3,8 @@
 namespace Laravel\Passport\Tests;
 
 use Laravel\Passport\ClientRepository;
+use Laravel\Passport\Contracts\ClientContract;
+use Laravel\Passport\Contracts\TokenContract;
 use Laravel\Passport\PersonalAccessTokenFactory;
 use Laravel\Passport\PersonalAccessTokenResult;
 use Laravel\Passport\Token;
@@ -47,14 +49,52 @@ class PersonalAccessTokenFactoryTest extends TestCase
     }
 }
 
-class PersonalAccessTokenFactoryTestClientStub
+class PersonalAccessTokenFactoryTestClientStub implements ClientContract
 {
     public $id = 1;
 
     public $secret = 'something';
+
+    /**
+     * @inheritDoc
+     */
+    public function getKey()
+    {
+        return $this->id;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function secret()
+    {
+        return $this->secret;
+    }
+
+    // Methods below not required for this test.
+    public function user(){}
+    public function authCodes(){}
+    public function tokens(){}
+    public function createClient($userId, $name, $redirect, $personalAccess = false, $password = false, $confidential = true){}
+    public function createPersonalAccessClient(){}
+    public function getClientSecret(){}
+    public function getGrantTypes(){}
+    public function personalAccessClient(){}
+    public function passwordClient(){}
+    public function confidential(){}
+    public function redirect(){}
+    public function name(){}
+    public function findById($id){}
+    public function findForUser($clientId, $userId) {}
+    public function forUser($userId){}
+    public function isRevoked(){}
+    public function updateNameAndRedirect($name, $redirect){}
+    public function regenerateSecret(){}
+    public function revokeTokens(){}
+    public function revoke(){}
 }
 
-class PersonalAccessTokenFactoryTestModelStub extends Token
+class PersonalAccessTokenFactoryTestModelStub extends Token implements TokenContract
 {
     public $id = 1;
 

@@ -93,7 +93,7 @@ abstract class CheckCredentials
     /**
      * Validate token credentials.
      *
-     * @param  \Laravel\Passport\Token  $token
+     * @param  \Laravel\Passport\Contracts\TokenContract  $token
      * @return void
      *
      * @throws \Illuminate\Auth\AuthenticationException
@@ -103,7 +103,7 @@ abstract class CheckCredentials
     /**
      * Validate token credentials.
      *
-     * @param  \Laravel\Passport\Token  $token
+     * @param  \Laravel\Passport\Contracts\TokenContract  $token
      * @param  array  $scopes
      * @return void
      *
