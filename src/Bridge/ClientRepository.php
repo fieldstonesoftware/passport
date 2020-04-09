@@ -30,7 +30,7 @@ class ClientRepository implements ClientRepositoryInterface
     /**
      * {@inheritdoc}
      */
-    public function getClientEntity($clientIdentifier)
+    public function getClientEntity($clientIdentifier, $grantType = NULL, $clientSecret = NULL, $mustValidateSecret = true)
     {
         $record = $this->clients->findActive($clientIdentifier);
 
