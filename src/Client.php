@@ -264,21 +264,11 @@ class Client extends Model implements ClientContract
     }
 
     /**
-     * Return the client secret
-     *
-     * @return string
-     */
-    public function secret()
-    {
-        return $this->secret;
-    }
-
-    /**
      * Return the client redirect
      *
      * @return string
      */
-    public function redirect()
+    public function getRedirect()
     {
         return $this->redirect;
     }
@@ -288,7 +278,7 @@ class Client extends Model implements ClientContract
      *
      * @return string
      */
-    public function name()
+    public function getName()
     {
         return $this->name;
     }
@@ -349,7 +339,7 @@ class Client extends Model implements ClientContract
      *
      * @return bool
      */
-    public function confidential()
+    public function isConfidential()
     {
         return ! empty($this->secret);
     }

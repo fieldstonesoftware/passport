@@ -202,7 +202,7 @@ class BridgeClientRepositoryTestClientStub implements ClientContract
         return $this->personal_access_client || $this->password_client;
     }
 
-    public function confidential()
+    public function isConfidential()
     {
         return ! empty($this->secret);
     }
@@ -210,15 +210,7 @@ class BridgeClientRepositoryTestClientStub implements ClientContract
     /**
      * @inheritDoc
      */
-    public function secret()
-    {
-        return $this->secret;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function redirect()
+    public function getRedirect()
     {
         return $this->redirect;
     }
@@ -226,9 +218,17 @@ class BridgeClientRepositoryTestClientStub implements ClientContract
     /**
      * @inheritDoc
      */
-    public function name()
+    public function getName()
     {
         return $this->name;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getClientSecret()
+    {
+        return $this->secret;
     }
 
     /**
@@ -262,7 +262,6 @@ class BridgeClientRepositoryTestClientStub implements ClientContract
     public function tokens(){}
     public function createPersonalAccessClient(){}
     public function getKey(){}
-    public function getClientSecret(){}
     public function findById($id){}
     public function findForUser($clientId, $userId){}
     public function forUser($userId){}

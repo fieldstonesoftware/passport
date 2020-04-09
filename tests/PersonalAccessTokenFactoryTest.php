@@ -81,9 +81,9 @@ class PersonalAccessTokenFactoryTestClientStub implements ClientContract
     public function getGrantTypes(){}
     public function personalAccessClient(){}
     public function passwordClient(){}
-    public function confidential(){}
-    public function redirect(){}
-    public function name(){}
+    public function isConfidential(){}
+    public function getRedirect(){}
+    public function getName(){}
     public function findById($id){}
     public function findForUser($clientId, $userId) {}
     public function forUser($userId){}

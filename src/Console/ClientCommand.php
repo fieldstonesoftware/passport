@@ -152,6 +152,6 @@ class ClientCommand extends Command
     protected function outputClientDetails(\Laravel\Passport\Contracts\ClientContract $client)
     {
         $this->line('<comment>Client ID:</comment> '.$client->getKey());
-        $this->line('<comment>Client secret:</comment> '.$client->secret());
+        $this->line('<comment>Client secret:</comment> '.$client->getClientSecret());
     }
 }

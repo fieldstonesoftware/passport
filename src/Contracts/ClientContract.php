@@ -87,28 +87,21 @@ interface ClientContract
      *
      * @return bool
      */
-    public function confidential();
-
-    /**
-     * Return the client secret
-     *
-     * @return string
-     */
-    public function secret();
+    public function isConfidential();
 
     /**
      * Return the client redirect
      *
      * @return string
      */
-    public function redirect();
+    public function getRedirect();
 
     /**
      * Return the client name
      *
      * @return string
      */
-    public function name();
+    public function getName();
 
     /**
      * Find a client by its identifier.

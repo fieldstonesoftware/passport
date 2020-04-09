@@ -39,7 +39,7 @@ class ClientRepository implements ClientRepositoryInterface
         }
 
         return new Client(
-            $clientIdentifier, $record->name(), $record->redirect(), $record->confidential()
+            $clientIdentifier, $record->getName(), $record->getRedirect(), $record->isConfidential()
         );
     }
 
@@ -57,7 +57,7 @@ class ClientRepository implements ClientRepositoryInterface
             return false;
         }
 
-        return ! $record->confidential() || $this->verifySecret((string) $clientSecret, $record->secret());
+        return ! $record->isConfidential() || $this->verifySecret((string) $clientSecret, $record->getClientSecret());
     }
 
     /**
@@ -78,11 +78,11 @@ class ClientRepository implements ClientRepositoryInterface
             case 'authorization_code':
                 return ! $record->firstParty();
             case 'personal_access':
-                return $record->personalAccessClient() && $record->confidential();
+                return $record->personalAccessClient() && $record->isConfidential();
             case 'password':
                 return $record->passwordClient();
             case 'client_credentials':
-                return $record->confidential();
+                return $record->isConfidential();
             default:
                 return true;
         }
