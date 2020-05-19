@@ -82,6 +82,13 @@ interface ClientContract
     public function passwordClient();
 
     /**
+     * Determine if the client should skip the authorization prompt.
+     *
+     * @return bool
+     */
+    public function skipsAuthorization();
+
+    /**
      * Determine if the client is a confidential client.
      * If the secret is populated, return true.
      *
