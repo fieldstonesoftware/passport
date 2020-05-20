@@ -82,6 +82,13 @@ interface ClientContract
     public function passwordClient();
 
     /**
+     * Determine if the client is a "first party" client.
+     *
+     * @return bool
+     */
+    public function firstParty();
+
+    /**
      * Determine if the client should skip the authorization prompt.
      *
      * @return bool
